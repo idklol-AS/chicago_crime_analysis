@@ -1,6 +1,6 @@
-mod read_dataset;
+mod crime_dataset;
 mod graph;
-use read_dataset::crime_dataset::{read_data, read_iucr};
+use crime_dataset::{read_data, read_iucr};
 use graph::{create_graph,find_centrality,group_by_area, ward_with_iucr_labels};
 
 fn main() {
