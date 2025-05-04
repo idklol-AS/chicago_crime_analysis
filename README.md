@@ -4,32 +4,21 @@ The question that I am answering is what are the most common occurring crimes ba
 Dataset: Source, size (link if too large for GitHub).
 https://catalog.data.gov/dataset/crimes-one-year-prior-to-present
 https://data.cityofchicago.org/Public-Safety/Chicago-Police-Department-Illinois-Uniform-Crime-R/c7ck-438e/about_data?no_mobile=true
+
 B. Data Processing
 How you loaded it into Rust.
 I used the csv crate to load the data into Rust. I iterated over each row in the csv file and extracted fields from each row which were case_number, ward, description, date, and iucr and put them into a struct called Crime which then I pushed the struct I created into a vector with all of the crimes recorded.
 Any cleaning or transformations applied.
 I filtered rows that had missing or invalid ward values. I normalized the IUCR by making sure that each IUCR was 4 digits long to avoid mismatches.I skipped rows that had a length less than the columns that were in the dataset.
+
 C. Code Structure
 Modules
-
-
 Purpose of each and rationale for organization.
 Read_dataset module read and parsed through all the data in the crime dataset and defined the Crime struct for each crime recorded. It also mapped the IUCR codes to the primary and secondary descriptions that it corresponds to.
 Graph module builds a graph of crimes based on IUCR and Ward and calculates the centrality. 
 The main module calls functions from other modules and reads, analyzes, and prints the results from the dataset it is given.
 Key Functions & Types (Structs, Enums, Traits, etc)
 
-
-For each non-trivial item, restate:
-
-
-Purpose
-
-
-Inputs/Outputs
-
-
-Core logic and key components
 The struct Crime represents one crime incident from the dataset. It had fields called  case_number, ward, description, date, and iucr to describe the crime more clearly. It is used to analyze and construct the graphs. 
 Fn read_data loads and filters the dataset from a CSV file. The input is the path of the dataset CSV file. THe output is a vector with struct Crime records. csv::Reader is used to iterate over rows, it skips rows with no or incorrect ward values.
 Fn read_iucr maps IUCR codes to their primary and secondary descriptions it represents. The input is the path of the IUCR CSV file. The output is a Hashmap that connects IUCR codes with their primary and secondary descriptions as a tuple. The function skips the header, trims each field and stores results in the HashMap.
@@ -128,8 +117,6 @@ The result for most commonly occurring IUCR per ward shows that certain types of
 
 F. Usage Instructions
 How to build and run your code.
-
-
 Description of any command-line arguments or user interaction in the terminal.
 
 
