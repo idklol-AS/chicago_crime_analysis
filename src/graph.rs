@@ -29,20 +29,12 @@ use crate::crime_dataset::Crime;
     pub fn find_centrality(crime_list:&Vec<Crime>,adj_list: &Vec<Vec<usize>>) -> Vec<(usize,usize)> {
         let mut nodes:Vec<(usize,usize)> = adj_list.iter().enumerate().map(|(i ,neighbors)| (i,neighbors.len())).collect();
         nodes.sort_by(|a,b| b.1.cmp(&a.1));
-        println!("Top 5 most connected crimes (degree centrality):");
-        //This iterates over the nodes list that is sorted from most connected to least connected and only takes the first five crimes that are most connected.
-        for (index, degree) in nodes.iter().take(5) {
-            let crime = &crime_list[*index];
-            println!(
-                "Crime Case Number: {}, Ward: {}, Degree: {}",
-                crime.case_number, crime.ward, degree
-            );
-    }
     nodes
 
     }
     //The purpose of this function is to the return the ward with the most crimes committed. 
     //The input for this function is the crime_list and the centrality vectors of the crime_list that were calculated from the function above.
+    // The output is it prints the top 5 wards by number of crimes along with their average degree.
     pub fn group_by_area(crime_list:&Vec<Crime>,centrality:&Vec<(usize,usize)>){
         let mut area_group:HashMap<usize, (usize,usize)> = HashMap::new();
         //This iterates over the crime_list created from the dataset.
@@ -58,7 +50,7 @@ use crate::crime_dataset::Crime;
         //This sorts the keys by the wards with the highest number of crimes.
         let mut sorted:Vec<(usize, f64, usize)> = area_group.into_iter().map(|(area, (degrees, count))| (area,(degrees as f64 / count as f64), count)).collect();
         sorted.sort_by(|a, b| b.2.cmp(&a.2));
-        println!("\nTop 5 community areas by number of crimes:");
+        println!("\nTop 5 wards by number of crimes:");
         for (area, count, avg_degree) in sorted.iter().take(5) {
             println!(
                 "Area {} → {} crimes, avg degree {:.2}",
@@ -68,6 +60,7 @@ use crate::crime_dataset::Crime;
     }
     //This function calculates the most common crime to occur in each ward and prints out the most common crime along with the ward. 
     //The input for this function is the crime_list and iucr_labels that were created from the crime_dataset module.
+    //The output of this function is the most commonly occurring IUCR in each ward along with the amount of reports of said IUCR code.
     pub fn ward_with_iucr_labels(crime_list:&Vec<Crime>,iucr_labels:HashMap<String, (String, String)>){
         let mut ward_map:HashMap<usize, HashMap<String,usize>> = HashMap::new();
         //The function iterates over each crime is inserted into a hashmap where the key is the ward, and the value is another HashMap that stores the IUCR label and the amount of times that specific IUCR label is committed in the ward.
@@ -78,6 +71,7 @@ use crate::crime_dataset::Crime;
             let iucr_count = ward_map.entry(ward).or_insert_with(HashMap::new);
             *iucr_count.entry(iucr).or_insert(0) += 1;
         }
+        println!("\n The most commonly occurring IUCR in each ward.");
         //This for loop prints out each ward where it's the most common crime occurred in said ward and the amount of reports correlating to said crime label.
         for (ward,iucrs) in ward_map{
             if let Some((iucr, count)) = iucrs.into_iter().max_by_key(|(_, c)| *c) {
@@ -93,3 +87,22 @@ use crate::crime_dataset::Crime;
             }
         }
     }
+    #[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::crime_dataset::Crime;
+
+    #[test]
+    fn test_graph_connections_by_iucr() {
+        let crimes = vec![
+            Crime { case_number: "1".into(), iucr: "0110".into(), date: "".into(), description: "HOMICIDE".into(), ward: 1 },
+            Crime { case_number: "2".into(), iucr: "0110".into(), date: "".into(), description: "HOMICIDE".into(), ward: 1 },
+            Crime { case_number: "3".into(), iucr: "0820".into(), date: "".into(),description: "THEFT".into(), ward: 2 },
+        ];
+        let graph = create_graph(&crimes); 
+          assert_eq!(graph[0], vec![1]);
+          assert_eq!(graph[1], vec![0]);
+
+          assert!(graph[2].is_empty());
+    }
+}

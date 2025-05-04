@@ -62,3 +62,31 @@ pub fn read_iucr(path:&str) -> HashMap<String, (String, String)>{
     label_map
 }
 
+#[cfg(test)]
+    mod tests {
+        use super::*;
+    
+        #[test]
+        fn test_iucr_to_four_digits() {
+            let input = "110";
+            let padded = if input.len() == 3 && input.chars().all(|c| c.is_ascii_digit()) {
+                format!("0{}", input)
+            } else {
+                input.to_string()
+            };
+            assert_eq!(padded, "0110");
+        }
+    
+        #[test]
+        fn test_valid_crime_struct() {
+            let crime = Crime {
+                case_number: "123456".to_string(),
+                iucr: "0110".to_string(),
+                date: "2023-01-01".to_string(),
+                description: "HOMICIDE".to_string(),
+                ward: 1,
+            };
+            assert_eq!(crime.ward, 1);
+        }
+    }
+    
